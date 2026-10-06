@@ -1,0 +1,1889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smartphone Battery Probability Analysis</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        "float": "float 6s ease-in-out infinite",
+                        "pulse-slow": "pulse 3s ease-in-out infinite",
+                        "gauge": "gauge 1.5s ease-out"
+                    },
+
+                    keyframes: {
+                        float: {
+                            "0%, 100%": {
+                                transform: "translateY(0px)"
+                            },
+                            "50%": {
+                                transform: "translateY(-12px)"
+                            }
+                        },
+
+                        gauge: {
+                            "0%": {
+                                strokeDashoffset: "100"
+                            },
+                            "100%": {
+                                strokeDashoffset: "0"
+                            }
+                        }
+                    }
+                }
+            }
+        };
+    </script>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+
+<body class="min-h-screen bg-slate-950 text-white">
+
+    <!-- =====================================================
+         BACKGROUND DECORATIONS
+         ===================================================== -->
+
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+
+        <div class="absolute -top-32 -left-32
+                    w-96 h-96
+                    bg-cyan-500/20
+                    rounded-full
+                    blur-3xl
+                    animate-pulse-slow">
+        </div>
+
+        <div class="absolute top-1/3 -right-32
+                    w-96 h-96
+                    bg-purple-500/20
+                    rounded-full
+                    blur-3xl
+                    animate-float">
+        </div>
+
+        <div class="absolute -bottom-32 left-1/3
+                    w-96 h-96
+                    bg-emerald-500/10
+                    rounded-full
+                    blur-3xl">
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MAIN CONTAINER
+         ===================================================== -->
+
+    <main class="relative max-w-7xl mx-auto
+                 px-4 py-8 md:px-8">
+
+
+        <!-- =================================================
+             HEADER
+             ================================================= -->
+
+        <section class="text-center mb-10">
+
+            <div class="inline-flex items-center gap-2
+                        px-4 py-2 mb-5
+                        rounded-full
+                        bg-cyan-400/10
+                        border border-cyan-400/20
+                        text-cyan-300 text-sm">
+
+                <span class="w-2 h-2
+                             bg-cyan-400
+                             rounded-full
+                             animate-pulse">
+                </span>
+
+                Mathematical Modeling & Probability Analysis
+
+            </div>
+
+
+            <h1 class="text-4xl md:text-6xl
+                       font-extrabold
+                       tracking-tight
+                       bg-gradient-to-r
+                       from-cyan-300
+                       via-white
+                       to-purple-300
+                       bg-clip-text
+                       text-transparent">
+
+                Smartphone Battery
+                <br>
+                Survival Analysis
+
+            </h1>
+
+
+            <p class="mt-5 max-w-2xl mx-auto
+                      text-slate-400
+                      text-base md:text-lg">
+
+                Analyze battery behavior using statistics,
+                probability, linear regression and mathematical
+                modeling.
+
+            </p>
+
+        </section>
+
+
+        <!-- =================================================
+             INPUT SECTION
+             ================================================= -->
+
+        <section class="grid lg:grid-cols-5
+                        gap-6 mb-8">
+
+
+            <!-- INPUT CARD -->
+
+            <div class="lg:col-span-3
+                        rounded-3xl
+                        border border-white/10
+                        bg-white/[0.06]
+                        backdrop-blur-xl
+                        p-6 md:p-8
+                        shadow-2xl">
+
+
+                <div class="flex items-center
+                            justify-between mb-6">
+
+                    <div>
+
+                        <p class="text-cyan-300
+                                  text-sm
+                                  font-semibold">
+
+                            DATA INPUT
+
+                        </p>
+
+
+                        <h2 class="text-2xl
+                                   font-bold mt-1">
+
+                            Battery Observations
+
+                        </h2>
+
+                    </div>
+
+
+                    <div class="text-4xl animate-float">
+
+                        🔋
+
+                    </div>
+
+                </div>
+
+
+                <!-- ERROR -->
+
+                {% if error %}
+
+                <div class="mb-6
+                            rounded-xl
+                            border border-red-400/30
+                            bg-red-500/10
+                            p-4
+                            text-red-300">
+
+                    <strong>Error:</strong>
+                    {{ error }}
+
+                </div>
+
+                {% endif %}
+
+
+                <!-- FORM -->
+
+                <form method="POST" action="/">
+
+
+                    <!-- TIME -->
+
+                    <div class="mb-5">
+
+                        <label class="block
+                                      text-sm
+                                      font-semibold
+                                      text-slate-300
+                                      mb-2">
+
+                            Time values
+
+                        </label>
+
+
+                        <input
+                            type="text"
+                            name="times"
+                            id="times"
+                            placeholder="Example: 1,2,3,4,5"
+                            required
+                            class="w-full
+                                   rounded-xl
+                                   bg-slate-900/80
+                                   border border-white/10
+                                   px-4 py-3
+                                   text-white
+                                   outline-none
+                                   focus:border-cyan-400
+                                   focus:ring-2
+                                   focus:ring-cyan-400/20
+                                   transition"
+                        >
+
+
+                        <p class="text-xs
+                                  text-slate-500
+                                  mt-2">
+
+                            Enter time values separated by commas.
+
+                        </p>
+
+                    </div>
+
+
+                    <!-- BATTERY -->
+
+                    <div class="mb-5">
+
+                        <label class="block
+                                      text-sm
+                                      font-semibold
+                                      text-slate-300
+                                      mb-2">
+
+                            Battery percentage
+
+                        </label>
+
+
+                        <input
+                            type="text"
+                            name="batteries"
+                            id="batteries"
+                            placeholder="Example: 100,90,82,74,65"
+                            required
+                            class="w-full
+                                   rounded-xl
+                                   bg-slate-900/80
+                                   border border-white/10
+                                   px-4 py-3
+                                   text-white
+                                   outline-none
+                                   focus:border-purple-400
+                                   focus:ring-2
+                                   focus:ring-purple-400/20
+                                   transition"
+                        >
+
+
+                        <p class="text-xs
+                                  text-slate-500
+                                  mt-2">
+
+                            Values must be between 0% and 100%.
+
+                        </p>
+
+                    </div>
+
+
+                    <!-- THRESHOLD -->
+
+                    <div class="mb-6">
+
+                        <label class="block
+                                      text-sm
+                                      font-semibold
+                                      text-slate-300
+                                      mb-2">
+
+                            Survival threshold (%)
+
+                        </label>
+
+
+                        <input
+                            type="number"
+                            name="threshold"
+                            id="threshold"
+                            value="20"
+                            min="0"
+                            max="100"
+                            step="1"
+                            required
+                            class="w-full
+                                   rounded-xl
+                                   bg-slate-900/80
+                                   border border-white/10
+                                   px-4 py-3
+                                   text-white
+                                   outline-none
+                                   focus:border-emerald-400
+                                   focus:ring-2
+                                   focus:ring-emerald-400/20
+                                   transition"
+                        >
+
+                    </div>
+
+
+                    <!-- BUTTONS -->
+
+                    <div class="flex
+                                flex-col
+                                sm:flex-row
+                                gap-3">
+
+
+                        <button
+                            type="submit"
+                            class="flex-1
+                                   rounded-xl
+                                   bg-gradient-to-r
+                                   from-cyan-500
+                                   to-blue-600
+                                   px-5 py-3
+                                   font-bold
+                                   shadow-lg
+                                   shadow-cyan-500/20
+                                   hover:scale-[1.02]
+                                   hover:shadow-cyan-500/40
+                                   transition">
+
+                            ⚡ Analyze Battery
+
+                        </button>
+
+
+                        <button
+                            type="button"
+                            onclick="loadExample()"
+                            class="flex-1
+                                   rounded-xl
+                                   bg-gradient-to-r
+                                   from-purple-500
+                                   to-pink-500
+                                   px-5 py-3
+                                   font-bold
+                                   shadow-lg
+                                   shadow-purple-500/20
+                                   hover:scale-[1.02]
+                                   hover:shadow-purple-500/40
+                                   transition">
+
+                            🎲 Generate New Example
+
+                        </button>
+
+
+                        <button
+                            type="button"
+                            onclick="clearForm()"
+                            class="rounded-xl
+                                   border border-white/10
+                                   bg-white/5
+                                   px-5 py-3
+                                   font-semibold
+                                   text-slate-300
+                                   hover:bg-white/10
+                                   transition">
+
+                            Clear
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+
+            <!-- =================================================
+                 HOW IT WORKS
+                 ================================================= -->
+
+            <div class="lg:col-span-2
+                        rounded-3xl
+                        bg-gradient-to-br
+                        from-indigo-500/20
+                        via-purple-500/10
+                        to-cyan-500/10
+                        border border-white/10
+                        backdrop-blur-xl
+                        p-6 md:p-8">
+
+
+                <p class="text-purple-300
+                          text-sm
+                          font-semibold">
+
+                    HOW IT WORKS
+
+                </p>
+
+
+                <h2 class="text-2xl
+                           font-bold
+                           mt-2
+                           mb-6">
+
+                    From Data to Prediction
+
+                </h2>
+
+
+                <div class="space-y-5">
+
+
+                    <div class="flex gap-4">
+
+                        <div class="w-10 h-10
+                                    shrink-0
+                                    rounded-xl
+                                    bg-cyan-400/10
+                                    flex items-center
+                                    justify-center">
+
+                            📊
+
+                        </div>
+
+
+                        <div>
+
+                            <h3 class="font-semibold">
+                                1. Statistics
+                            </h3>
+
+                            <p class="text-sm
+                                      text-slate-400
+                                      mt-1">
+
+                                Calculates mean, variance and
+                                standard deviation.
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="flex gap-4">
+
+                        <div class="w-10 h-10
+                                    shrink-0
+                                    rounded-xl
+                                    bg-purple-400/10
+                                    flex items-center
+                                    justify-center">
+
+                            📈
+
+                        </div>
+
+
+                        <div>
+
+                            <h3 class="font-semibold">
+                                2. Regression
+                            </h3>
+
+                            <p class="text-sm
+                                      text-slate-400
+                                      mt-1">
+
+                                Finds the mathematical relationship
+                                between time and battery level.
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="flex gap-4">
+
+                        <div class="w-10 h-10
+                                    shrink-0
+                                    rounded-xl
+                                    bg-emerald-400/10
+                                    flex items-center
+                                    justify-center">
+
+                            🎯
+
+                        </div>
+
+
+                        <div>
+
+                            <h3 class="font-semibold">
+                                3. Prediction
+                            </h3>
+
+                            <p class="text-sm
+                                      text-slate-400
+                                      mt-1">
+
+                                Estimates when the battery reaches
+                                the selected threshold.
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="flex gap-4">
+
+                        <div class="w-10 h-10
+                                    shrink-0
+                                    rounded-xl
+                                    bg-pink-400/10
+                                    flex items-center
+                                    justify-center">
+
+                            🎲
+
+                        </div>
+
+
+                        <div>
+
+                            <h3 class="font-semibold">
+                                4. Probability
+                            </h3>
+
+                            <p class="text-sm
+                                      text-slate-400
+                                      mt-1">
+
+                                Calculates probability using the
+                                normal distribution.
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        {% if result %}
+
+
+        <!-- =================================================
+             RESULTS HEADER
+             ================================================= -->
+
+        <section class="mb-6">
+
+            <div class="flex items-center gap-3">
+
+                <div class="w-12 h-12
+                            rounded-2xl
+                            bg-gradient-to-br
+                            from-emerald-400
+                            to-cyan-500
+                            flex items-center
+                            justify-center
+                            text-2xl
+                            shadow-lg
+                            shadow-emerald-500/20">
+
+                    ✓
+
+                </div>
+
+
+                <div>
+
+                    <p class="text-emerald-300
+                              text-sm
+                              font-semibold">
+
+                        ANALYSIS COMPLETE
+
+                    </p>
+
+
+                    <h2 class="text-3xl
+                               font-bold">
+
+                        Battery Intelligence Dashboard
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             STATISTICS CARDS
+             ================================================= -->
+
+        <section class="grid
+                        grid-cols-1
+                        sm:grid-cols-2
+                        lg:grid-cols-3
+                        gap-5
+                        mb-8">
+
+
+            <!-- MEAN -->
+
+            <div class="result-card
+                        rounded-2xl
+                        bg-white/[0.06]
+                        border border-white/10
+                        p-6
+                        backdrop-blur-xl
+                        hover:-translate-y-1
+                        transition">
+
+                <p class="text-slate-400 text-sm">
+                    Mean Battery
+                </p>
+
+
+                <div class="text-3xl
+                            font-bold
+                            text-cyan-300
+                            mt-2">
+
+                    {{ result.mean_battery }}%
+
+                </div>
+
+
+                <p class="text-xs
+                          text-slate-500
+                          mt-2">
+
+                    Average battery level
+
+                </p>
+
+            </div>
+
+
+            <!-- VARIANCE -->
+
+            <div class="result-card
+                        rounded-2xl
+                        bg-white/[0.06]
+                        border border-white/10
+                        p-6
+                        backdrop-blur-xl
+                        hover:-translate-y-1
+                        transition">
+
+                <p class="text-slate-400 text-sm">
+                    Variance
+                </p>
+
+
+                <div class="text-3xl
+                            font-bold
+                            text-purple-300
+                            mt-2">
+
+                    {{ result.variance }}
+
+                </div>
+
+
+                <p class="text-xs
+                          text-slate-500
+                          mt-2">
+
+                    Spread of battery values
+
+                </p>
+
+            </div>
+
+
+            <!-- STANDARD DEVIATION -->
+
+            <div class="result-card
+                        rounded-2xl
+                        bg-white/[0.06]
+                        border border-white/10
+                        p-6
+                        backdrop-blur-xl
+                        hover:-translate-y-1
+                        transition">
+
+                <p class="text-slate-400 text-sm">
+                    Standard Deviation
+                </p>
+
+
+                <div class="text-3xl
+                            font-bold
+                            text-pink-300
+                            mt-2">
+
+                    {{ result.standard_deviation }}
+
+                </div>
+
+
+                <p class="text-xs
+                          text-slate-500
+                          mt-2">
+
+                    Variation in battery levels
+
+                </p>
+
+            </div>
+
+
+            <!-- DRAIN RATE -->
+
+            <div class="result-card
+                        rounded-2xl
+                        bg-white/[0.06]
+                        border border-white/10
+                        p-6
+                        backdrop-blur-xl
+                        hover:-translate-y-1
+                        transition">
+
+                <p class="text-slate-400 text-sm">
+                    Drain Rate
+                </p>
+
+
+                <div class="text-3xl
+                            font-bold
+                            text-orange-300
+                            mt-2">
+
+                    {{ result.drain_rate }}%
+
+                </div>
+
+
+                <p class="text-xs
+                          text-slate-500
+                          mt-2">
+
+                    Battery lost per hour
+
+                </p>
+
+            </div>
+
+
+            <!-- CORRELATION -->
+
+            <div class="result-card
+                        rounded-2xl
+                        bg-white/[0.06]
+                        border border-white/10
+                        p-6
+                        backdrop-blur-xl
+                        hover:-translate-y-1
+                        transition">
+
+                <p class="text-slate-400 text-sm">
+                    Correlation
+                </p>
+
+
+                <div class="text-3xl
+                            font-bold
+                            text-blue-300
+                            mt-2">
+
+                    {{ result.correlation }}
+
+                </div>
+
+
+                <p class="text-xs
+                          text-slate-500
+                          mt-2">
+
+                    Time vs battery relationship
+
+                </p>
+
+            </div>
+
+
+            <!-- R SQUARED -->
+
+            <div class="result-card
+                        rounded-2xl
+                        bg-white/[0.06]
+                        border border-white/10
+                        p-6
+                        backdrop-blur-xl
+                        hover:-translate-y-1
+                        transition">
+
+                <p class="text-slate-400 text-sm">
+                    R² Score
+                </p>
+
+
+                <div class="text-3xl
+                            font-bold
+                            text-emerald-300
+                            mt-2">
+
+                    {{ result.r_squared }}
+
+                </div>
+
+
+                <p class="text-xs
+                          text-slate-500
+                          mt-2">
+
+                    Model fit
+
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             NEW BATTERY GAUGE + SURVIVAL PREDICTION
+             ================================================= -->
+
+        <section class="mb-8">
+
+            <div class="relative overflow-hidden
+                        rounded-3xl
+                        bg-gradient-to-r
+                        from-emerald-500/20
+                        via-cyan-500/10
+                        to-blue-500/20
+                        border border-emerald-400/20
+                        p-7 md:p-9">
+
+
+                <!-- Background battery -->
+
+                <div class="absolute
+                            -right-10
+                            -top-10
+                            text-[150px]
+                            opacity-10
+                            animate-float">
+
+                    🔋
+
+                </div>
+
+
+                <div class="relative
+                            grid
+                            lg:grid-cols-2
+                            gap-10
+                            items-center">
+
+
+                    <!-- GAUGE -->
+
+                    <div class="flex
+                                flex-col
+                                items-center
+                                justify-center">
+
+
+                        <p class="text-emerald-300
+                                  text-sm
+                                  font-semibold
+                                  mb-5">
+
+                            CURRENT BATTERY LEVEL
+
+                        </p>
+
+
+                        <div class="relative
+                                    w-64 h-64">
+
+
+                            <!-- SVG Gauge -->
+
+                            <svg
+                                class="w-full h-full
+                                       -rotate-90"
+                                viewBox="0 0 120 120">
+
+
+                                <!-- Background -->
+
+                                <circle
+                                    cx="60"
+                                    cy="60"
+                                    r="50"
+                                    fill="none"
+                                    stroke="rgba(255,255,255,0.08)"
+                                    stroke-width="10"
+                                />
+
+
+                                <!-- Progress -->
+
+                                <circle
+                                    id="batteryGauge"
+                                    cx="60"
+                                    cy="60"
+                                    r="50"
+                                    fill="none"
+                                    stroke="url(#batteryGradient)"
+                                    stroke-width="10"
+                                    stroke-linecap="round"
+                                    stroke-dasharray="314"
+                                    stroke-dashoffset="314"
+                                    class="transition-all duration-1000"
+                                />
+
+
+                                <defs>
+
+                                    <linearGradient
+                                        id="batteryGradient"
+                                        x1="0%"
+                                        y1="0%"
+                                        x2="100%"
+                                        y2="100%">
+
+                                        <stop
+                                            offset="0%"
+                                            stop-color="#22c55e"
+                                        />
+
+                                        <stop
+                                            offset="50%"
+                                            stop-color="#06b6d4"
+                                        />
+
+                                        <stop
+                                            offset="100%"
+                                            stop-color="#3b82f6"
+                                        />
+
+                                    </linearGradient>
+
+                                </defs>
+
+                            </svg>
+
+
+                            <!-- Center -->
+
+                            <div class="absolute
+                                        inset-0
+                                        flex
+                                        flex-col
+                                        items-center
+                                        justify-center">
+
+                                <div
+                                    id="batteryGaugeValue"
+                                    class="text-5xl
+                                           font-black
+                                           text-white">
+
+                                    --%
+
+                                </div>
+
+
+                                <div
+                                    id="batteryStatus"
+                                    class="text-sm
+                                           text-emerald-300
+                                           mt-1">
+
+                                    Analyzing...
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <p class="text-xs
+                                  text-slate-500
+                                  mt-3">
+
+                            Based on the latest battery observation
+
+                        </p>
+
+                    </div>
+
+
+                    <!-- SURVIVAL INFORMATION -->
+
+                    <div>
+
+                        <p class="text-emerald-300
+                                  text-sm
+                                  font-semibold">
+
+                            SURVIVAL PREDICTION
+
+                        </p>
+
+
+                        <h2 class="text-3xl
+                                   font-bold
+                                   mt-2">
+
+                            Estimated Battery
+                            Survival Time
+
+                        </h2>
+
+
+                        {% if result.survival_prediction is not none %}
+
+
+                        <div class="mt-7">
+
+
+                            <div class="text-6xl
+                                        md:text-7xl
+                                        font-black
+                                        bg-gradient-to-r
+                                        from-emerald-300
+                                        to-cyan-300
+                                        bg-clip-text
+                                        text-transparent">
+
+                                {{ result.survival_prediction }}
+
+                                <span class="text-2xl
+                                             text-emerald-200">
+
+                                    hours
+
+                                </span>
+
+                            </div>
+
+
+                            <p class="text-slate-300 mt-5">
+
+                                The mathematical model estimates
+                                that the battery will reach
+
+                                <strong class="text-white">
+
+                                    {{ result.threshold }}%
+
+                                </strong>
+
+                                at approximately this time.
+
+                            </p>
+
+
+                            <div class="mt-5
+                                        rounded-2xl
+                                        bg-white/5
+                                        border border-white/10
+                                        p-4">
+
+                                <p class="text-sm
+                                          text-slate-400">
+
+                                    Estimated drain rate
+
+                                </p>
+
+
+                                <p class="text-2xl
+                                          font-bold
+                                          text-orange-300
+                                          mt-1">
+
+                                    {{ result.drain_rate }}%
+                                    per hour
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        {% else %}
+
+
+                        <div class="mt-6
+                                    rounded-2xl
+                                    bg-red-500/10
+                                    border border-red-400/20
+                                    p-5
+                                    text-red-300">
+
+                            {{ result.threshold_message }}
+
+                        </div>
+
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CHARTS
+             ================================================= -->
+
+        <section class="grid
+                        lg:grid-cols-2
+                        gap-6
+                        mb-8">
+
+
+            <!-- BATTERY CHART -->
+
+            <div class="rounded-3xl
+                        bg-white/[0.06]
+                        border border-white/10
+                        backdrop-blur-xl
+                        p-6">
+
+
+                <div class="mb-5">
+
+                    <p class="text-cyan-300
+                              text-sm
+                              font-semibold">
+
+                        TREND ANALYSIS
+
+                    </p>
+
+
+                    <h2 class="text-xl
+                               font-bold
+                               mt-1">
+
+                        Battery vs Time
+
+                    </h2>
+
+                </div>
+
+
+                <div class="h-80">
+
+                    <canvas id="batteryChart"></canvas>
+
+                </div>
+
+            </div>
+
+
+            <!-- PROBABILITY CHART -->
+
+            <div class="rounded-3xl
+                        bg-white/[0.06]
+                        border border-white/10
+                        backdrop-blur-xl
+                        p-6">
+
+
+                <div class="mb-5">
+
+                    <p class="text-purple-300
+                              text-sm
+                              font-semibold">
+
+                        PROBABILITY ANALYSIS
+
+                    </p>
+
+
+                    <h2 class="text-xl
+                               font-bold
+                               mt-1">
+
+                        Probability Distribution
+
+                    </h2>
+
+                </div>
+
+
+                <div class="h-80">
+
+                    <canvas id="probabilityChart"></canvas>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             PROBABILITY DETAILS
+             ================================================= -->
+
+        <section class="grid
+                        md:grid-cols-3
+                        gap-5
+                        mb-8">
+
+
+            <!-- Z SCORE -->
+
+            <div class="rounded-2xl
+                        bg-cyan-500/10
+                        border border-cyan-400/20
+                        p-6">
+
+                <p class="text-sm
+                          text-cyan-300">
+
+                    Z-SCORE
+
+                </p>
+
+
+                <p class="text-3xl
+                          font-bold
+                          mt-2">
+
+                    {{ result.z_score }}
+
+                </p>
+
+            </div>
+
+
+            <!-- NORMAL -->
+
+            <div class="rounded-2xl
+                        bg-purple-500/10
+                        border border-purple-400/20
+                        p-6">
+
+                <p class="text-sm
+                          text-purple-300">
+
+                    NORMAL PROBABILITY
+
+                </p>
+
+
+                <p class="text-3xl
+                          font-bold
+                          mt-2">
+
+                    {{ (result.normal_probability * 100)|round(2) }}%
+
+                </p>
+
+            </div>
+
+
+            <!-- EMPIRICAL -->
+
+            <div class="rounded-2xl
+                        bg-pink-500/10
+                        border border-pink-400/20
+                        p-6">
+
+                <p class="text-sm
+                          text-pink-300">
+
+                    EMPIRICAL PROBABILITY
+
+                </p>
+
+
+                <p class="text-3xl
+                          font-bold
+                          mt-2">
+
+                    {{ (result.empirical_probability * 100)|round(2) }}%
+
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             MATHEMATICAL INTERPRETATION
+             ================================================= -->
+
+        <section class="rounded-3xl
+                        bg-white/[0.06]
+                        border border-white/10
+                        backdrop-blur-xl
+                        p-6 md:p-8
+                        mb-8">
+
+
+            <p class="text-yellow-300
+                      text-sm
+                      font-semibold">
+
+                MATHEMATICAL INTERPRETATION
+
+            </p>
+
+
+            <h2 class="text-2xl
+                       font-bold
+                       mt-2
+                       mb-6">
+
+                What the Model Tells Us
+
+            </h2>
+
+
+            <div class="grid
+                        md:grid-cols-2
+                        gap-5">
+
+
+                <!-- DRAIN -->
+
+                <div class="rounded-2xl
+                            bg-white/5
+                            border border-white/5
+                            p-5">
+
+                    <h3 class="font-bold
+                               text-cyan-300
+                               mb-2">
+
+                        Battery Drain
+
+                    </h3>
+
+
+                    <p class="text-slate-300">
+
+                        {{ result.drain_interpretation }}
+
+                    </p>
+
+                </div>
+
+
+                <!-- CORRELATION -->
+
+                <div class="rounded-2xl
+                            bg-white/5
+                            border border-white/5
+                            p-5">
+
+                    <h3 class="font-bold
+                               text-purple-300
+                               mb-2">
+
+                        Correlation
+
+                    </h3>
+
+
+                    <p class="text-slate-300">
+
+                        {{ result.correlation_interpretation }}
+
+                    </p>
+
+                </div>
+
+
+                <!-- REGRESSION -->
+
+                <div class="rounded-2xl
+                            bg-white/5
+                            border border-white/5
+                            p-5">
+
+                    <h3 class="font-bold
+                               text-emerald-300
+                               mb-2">
+
+                        Regression Model
+
+                    </h3>
+
+
+                    <p class="text-slate-300">
+
+                        Battery =
+
+                        <strong class="text-white">
+
+                            {{ result.slope }}
+
+                        </strong>
+
+                        × Time +
+
+                        <strong class="text-white">
+
+                            {{ result.intercept }}
+
+                        </strong>
+
+                    </p>
+
+                </div>
+
+
+                <!-- THRESHOLD -->
+
+                <div class="rounded-2xl
+                            bg-white/5
+                            border border-white/5
+                            p-5">
+
+                    <h3 class="font-bold
+                               text-pink-300
+                               mb-2">
+
+                        Threshold
+
+                    </h3>
+
+
+                    <p class="text-slate-300">
+
+                        {{ result.threshold_message }}
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             DATA TABLE
+             ================================================= -->
+
+        <section class="rounded-3xl
+                        bg-white/[0.06]
+                        border border-white/10
+                        backdrop-blur-xl
+                        p-6 md:p-8
+                        mb-8">
+
+
+            <p class="text-blue-300
+                      text-sm
+                      font-semibold">
+
+                OBSERVATION DATA
+
+            </p>
+
+
+            <h2 class="text-2xl
+                       font-bold
+                       mt-2
+                       mb-5">
+
+                Battery Probability Distribution
+
+            </h2>
+
+
+            <div class="overflow-x-auto">
+
+
+                <table class="w-full text-left">
+
+
+                    <thead>
+
+                        <tr class="border-b
+                                   border-white/10">
+
+                            <th class="py-3
+                                       px-4
+                                       text-slate-400">
+
+                                Battery (%)
+
+                            </th>
+
+
+                            <th class="py-3
+                                       px-4
+                                       text-slate-400">
+
+                                Probability Density
+
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+
+                        {% for item in result.probability_distribution %}
+
+
+                        <tr class="border-b
+                                   border-white/5
+                                   hover:bg-white/5
+                                   transition">
+
+
+                            <td class="py-3 px-4">
+
+                                {{ item.battery }}%
+
+                            </td>
+
+
+                            <td class="py-3
+                                       px-4
+                                       text-cyan-300">
+
+                                {{ item.probability }}
+
+                            </td>
+
+                        </tr>
+
+
+                        {% endfor %}
+
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        {% endif %}
+
+
+        <!-- =================================================
+             FOOTER
+             ================================================= -->
+
+        <footer class="text-center
+                       py-8
+                       border-t
+                       border-white/10">
+
+
+            <p class="text-slate-500
+                      text-sm">
+
+                Mathematical Modeling and Probability Analysis
+
+            </p>
+
+
+            <p class="text-slate-600
+                      text-xs
+                      mt-2">
+
+                Smartphone Battery Survival Project
+
+            </p>
+
+        </footer>
+
+
+    </main>
+
+
+    <!-- =====================================================
+         FLASK DATA FOR JAVASCRIPT
+         ===================================================== -->
+
+    {% if result %}
+
+    <script>
+
+        const times =
+            {{ result.times | tojson }};
+
+        const batteries =
+            {{ result.batteries | tojson }};
+
+        const predictedBattery =
+            {{ result.predicted_battery | tojson }};
+
+
+        const probabilityLabels =
+            {{ result.probability_distribution
+               | map(attribute='battery')
+               | list
+               | tojson }};
+
+
+        const probabilityValues =
+            {{ result.probability_distribution
+               | map(attribute='probability')
+               | list
+               | tojson }};
+
+
+        /*
+         * Latest battery value
+         *
+         * This is taken directly from the
+         * user's entered data.
+         */
+
+        const latestBattery =
+            batteries.length > 0
+                ? batteries[batteries.length - 1]
+                : 0;
+
+
+    </script>
+
+    {% else %}
+
+    <script>
+
+        const times = [];
+
+        const batteries = [];
+
+        const predictedBattery = [];
+
+        const probabilityLabels = [];
+
+        const probabilityValues = [];
+
+        const latestBattery = 0;
+
+    </script>
+
+    {% endif %}
+
+
+    <!-- Main JavaScript -->
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+
+    <!-- =====================================================
+         BATTERY GAUGE SCRIPT
+         ===================================================== -->
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                const gauge =
+                    document.getElementById(
+                        "batteryGauge"
+                    );
+
+                const gaugeValue =
+                    document.getElementById(
+                        "batteryGaugeValue"
+                    );
+
+                const batteryStatus =
+                    document.getElementById(
+                        "batteryStatus"
+                    );
+
+
+                if (
+                    gauge &&
+                    gaugeValue &&
+                    batteryStatus &&
+                    batteries.length > 0
+                ) {
+
+                    const battery =
+                        Math.max(
+                            0,
+                            Math.min(
+                                100,
+                                latestBattery
+                            )
+                        );
+
+
+                    const circumference =
+                        2 * Math.PI * 50;
+
+
+                    const progress =
+                        circumference -
+                        (
+                            battery / 100
+                        ) * circumference;
+
+
+                    gauge.style.strokeDasharray =
+                        circumference;
+
+
+                    gauge.style.strokeDashoffset =
+                        progress;
+
+
+                    /*
+                     * Animate number
+                     */
+
+                    let current = 0;
+
+
+                    const animation =
+                        setInterval(
+                            function () {
+
+                                current += 1;
+
+
+                                if (current >= battery) {
+
+                                    current = battery;
+
+                                    clearInterval(
+                                        animation
+                                    );
+
+                                }
+
+
+                                gaugeValue.textContent =
+                                    current.toFixed(1) + "%";
+
+
+                            },
+                            15
+                        );
+
+
+                    /*
+                     * Battery status
+                     */
+
+                    if (battery >= 70) {
+
+                        batteryStatus.textContent =
+                            "Healthy";
+
+                        batteryStatus.className =
+                            "text-sm text-emerald-300 mt-1";
+
+                    }
+
+                    else if (battery >= 40) {
+
+                        batteryStatus.textContent =
+                            "Moderate";
+
+                        batteryStatus.className =
+                            "text-sm text-yellow-300 mt-1";
+
+                    }
+
+                    else if (battery >= 20) {
+
+                        batteryStatus.textContent =
+                            "Low";
+
+                        batteryStatus.className =
+                            "text-sm text-orange-300 mt-1";
+
+                    }
+
+                    else {
+
+                        batteryStatus.textContent =
+                            "Critical";
+
+                        batteryStatus.className =
+                            "text-sm text-red-300 mt-1";
+
+                    }
+
+                }
+
+            }
+        );
+
+    </script>
+
+</body>
+</html>

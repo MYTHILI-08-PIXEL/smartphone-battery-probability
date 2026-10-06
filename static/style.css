@@ -1,0 +1,347 @@
+/* =========================================================
+   SMARTPHONE BATTERY PROBABILITY ANALYSIS
+   Modern Dashboard Styling
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+        BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* =========================================================
+   CUSTOM SCROLLBAR
+   ========================================================= */
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #020617;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #06b6d4;
+}
+
+/* =========================================================
+   INPUTS
+   ========================================================= */
+
+input {
+    transition:
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        transform 0.25s ease;
+}
+
+input:hover {
+    border-color: rgba(148, 163, 184, 0.35);
+}
+
+input:focus {
+    transform: translateY(-1px);
+}
+
+/* Remove number input arrows */
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    opacity: 0.6;
+}
+
+/* =========================================================
+   RESULT CARD ANIMATION
+   ========================================================= */
+
+.result-card {
+    animation: cardAppear 0.6s ease both;
+}
+
+.result-card:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.result-card:nth-child(2) {
+    animation-delay: 0.10s;
+}
+
+.result-card:nth-child(3) {
+    animation-delay: 0.15s;
+}
+
+.result-card:nth-child(4) {
+    animation-delay: 0.20s;
+}
+
+.result-card:nth-child(5) {
+    animation-delay: 0.25s;
+}
+
+.result-card:nth-child(6) {
+    animation-delay: 0.30s;
+}
+
+@keyframes cardAppear {
+
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+/* =========================================================
+   GENERAL SECTION ANIMATION
+   ========================================================= */
+
+section {
+    animation: sectionAppear 0.7s ease both;
+}
+
+@keyframes sectionAppear {
+
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+/* =========================================================
+   BUTTON EFFECT
+   ========================================================= */
+
+button {
+    cursor: pointer;
+}
+
+button:active {
+    transform: scale(0.97);
+}
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+table {
+    border-collapse: collapse;
+}
+
+tbody tr {
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+tbody tr:hover {
+    transform: translateX(3px);
+}
+
+/* =========================================================
+   CHART CONTAINER
+   ========================================================= */
+
+canvas {
+    max-width: 100%;
+}
+
+/* =========================================================
+   GLASS EFFECT
+   ========================================================= */
+
+.glass-effect {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+/* =========================================================
+   GLOW EFFECTS
+   ========================================================= */
+
+.glow-cyan {
+    box-shadow:
+        0 0 25px rgba(6, 182, 212, 0.15);
+}
+
+.glow-purple {
+    box-shadow:
+        0 0 25px rgba(168, 85, 247, 0.15);
+}
+
+.glow-green {
+    box-shadow:
+        0 0 25px rgba(34, 197, 94, 0.15);
+}
+
+/* =========================================================
+   BATTERY SURVIVAL AREA
+   ========================================================= */
+
+.survival-panel {
+    position: relative;
+    overflow: hidden;
+}
+
+.survival-panel::before {
+    content: "";
+    position: absolute;
+
+    width: 250px;
+    height: 250px;
+
+    right: -100px;
+    top: -100px;
+
+    background: rgba(34, 211, 238, 0.12);
+
+    border-radius: 50%;
+
+    filter: blur(30px);
+
+    pointer-events: none;
+}
+
+/* =========================================================
+   FLOATING ICON
+   ========================================================= */
+
+.floating-icon {
+    animation: floatingIcon 4s ease-in-out infinite;
+}
+
+@keyframes floatingIcon {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+}
+
+/* =========================================================
+   PULSE
+   ========================================================= */
+
+.soft-pulse {
+    animation: softPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes softPulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.65;
+    }
+
+}
+
+/* =========================================================
+   GRADIENT TEXT
+   ========================================================= */
+
+.gradient-text {
+    background: linear-gradient(
+        90deg,
+        #67e8f9,
+        #ffffff,
+        #c4b5fd
+    );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    color: transparent;
+}
+
+/* =========================================================
+   ERROR MESSAGE
+   ========================================================= */
+
+.error-message {
+    animation: errorAppear 0.4s ease;
+}
+
+@keyframes errorAppear {
+
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    body {
+        overflow-x: hidden;
+    }
+
+    h1 {
+        line-height: 1.1;
+    }
+
+    input {
+        font-size: 16px;
+    }
+
+}
+
+/* =========================================================
+   REDUCED MOTION ACCESSIBILITY
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+}
